@@ -14,11 +14,11 @@
 from ftplib import FTP_TLS
 import os.path
 
-local_dir_path = '/Users/Lenni/Desktop/Box Images/'
+local_dir_path = 'path/'
 
 ftp = FTP_TLS('ftp.box.com')
 print("Welcome: ", ftp.getwelcome())
-ftp.login(user='ljusten@wisc.edu', passwd='Germany2013!_m')
+ftp.login(user='username', passwd='password')
 
 main_dir = ftp.retrlines('LIST')
 ftp.pwd()
