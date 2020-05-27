@@ -22,7 +22,7 @@ ftp.login(user='username', passwd='password')
 
 main_dir = ftp.retrlines('LIST')
 ftp.pwd()
-ftp.cwd('WMEL-Tick Images/Submitted Images')
+ftp.cwd('Box_folder_path/')
 print(ftp.pwd())
 
 filenames = ftp.nlst()  # get filenames within the directory
