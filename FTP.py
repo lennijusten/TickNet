@@ -46,3 +46,4 @@ for filename in filenames:
 ftp.quit()  # close connection
 print(new_count, " new images were downloaded")
 print(exist_count, " images already existed in local directory:", local_dir_path)
+print("Yup")
