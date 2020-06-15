@@ -1,5 +1,12 @@
+# TensorFlow model development
+# Author: Lennart Justen
+# Last revision: 5/29/20
+
+# Description:
+
 # Documentation
 # https://www.tensorflow.org/tutorials/load_data/images
+# https://towardsdatascience.com/easy-image-classification-with-tensorflow-2-0-f734fee52d13
 
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
@@ -9,8 +16,11 @@ import os
 import pathlib
 import matplotlib.pyplot as plt
 import time
+from datetime import datetime
+from tensorflow import keras
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
+#os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 main_dir = '/Users/Lenni/Documents/Independent Research Project/Data/test_train/Test Data'
 data_dir = pathlib.Path(main_dir)
@@ -113,6 +123,14 @@ filecache_ds = prepare_for_training(labeled_ds, cache="./Test Data.tfcache")
 timeit(filecache_ds)
 
 val_dataset = filecache_ds.take(417)
+
+val_label = []
+
+for _, label in val_dataset:
+    val_label.append(label)
+
+
+
 train_dataset = filecache_ds.skip(417)
 
 # image_batch, label_batch = next(iter(filecache_ds))
@@ -160,7 +178,10 @@ base_model.trainable = False
 
 # Trainable classification head
 maxpool_layer = tf.keras.layers.GlobalMaxPooling2D()
-prediction_layer = tf.keras.layers.Dense(4, activation='sigmoid')
+prediction_layer = tf.keras.layers.Dense(4, activation='softmax')
+
+logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
 # Layer classification head with feature detector
 model = tf.keras.Sequential([
@@ -169,11 +190,11 @@ model = tf.keras.Sequential([
     prediction_layer
 ])
 
-learning_rate = 0.0005
+learning_rate = 0.01
 
 # Compile the model
 model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
-              loss='binary_crossentropy',
+              loss='categorical_crossentropy',
               metrics=['accuracy']
 )
 
@@ -181,9 +202,29 @@ model.summary()
 
 num_epochs = 30
 steps_per_epoch = round(image_count-417)//BATCH_SIZE
-val_steps = 20
+#val_steps = 20
 model.fit(train_dataset.repeat(),
           epochs=num_epochs,
-          steps_per_epoch = steps_per_epoch,
+          shuffle=True,
+          steps_per_epoch=steps_per_epoch,
           validation_data=val_dataset.repeat(),
-          validation_steps=val_steps)
+          validation_steps=30,
+          validation_freq=2)
+
+#results = model.evaluate(val_dataset, batch_size=32)
+
+predictions = model.predict(val_dataset)
+
+# tf.math.confusion_matrix(
+#     val_dataset, predictions, num_classes=4, weights=None, dtype=tf.dtypes.float32,
+#     name=None
+# )
+
+# serialize model to JSON
+model_json = model.to_json()
+with open("model.json", "w") as json_file:
+    json_file.write(model_json)
+# serialize weights to HDF5
+model.save_weights("model.h5")
+print("Saved model to disk")
+
