@@ -58,10 +58,14 @@ print(filenames)
 print("Found {} images in folder. Retrieving...".format(len(filenames)))
 new_count = 0
 exist_count = 0
+
 new_files = []
 new_filenames = []
+
 exist_files = []
 exist_filenames = []
+
+id = []
 for filename in filenames[0:10]:
     local_filename = os.path.join(save_path, filename)
     if not os.path.exists(local_filename):
@@ -70,11 +74,13 @@ for filename in filenames[0:10]:
         ftp.retrbinary('RETR ' + filename, file.write)
         new_files.append(local_filename)
         new_filenames.append(filename)
+        id.append(os.path.splitext(filename)[0])
         file.close()
     else:
         exist_count += 1
         exist_files.append(local_filename)
         exist_filenames.append(filename)
+        id.append(os.path.splitext(filename)[0])
 
 ftp.quit()  # close connection
 print(new_count, " new images were downloaded")
@@ -133,51 +139,45 @@ for fname in cropped_imgs:
 # stack up images list to pass for prediction
 images = np.vstack(images)
 results = loaded_model.predict(images, batch_size=10)
-class_prob = np.amax(results, 1)
+class_prob = np.amax(results, 1).tolist()
 classes = np.argmax(results, 1)
 
 tabs = []
+species = []
+sex = []
 for idx in classes:
+    species.append(labels[idx].split('_')[0])
+    sex.append(labels[idx].split('_')[2].capitalize())
     tabs.append(labels[idx].split('_'))
 
-
-
-
+input = [species, sex, class_prob]
 
 gc = gspread.service_account(filename=service_acc)
 sh = gc.open(ss)
-
 worksheet = sh.sheet1
 column_headers = worksheet.row_values(1)
 print(column_headers)
-
-ID = '200203-1815-21' # todo: Get ID numbers from filenames
-
-# todo: Add following code into loop through all IDs
-rows = worksheet.findall(ID, in_column=worksheet.find("Tick_ID").col)
-if len(rows) == 0:
-    print("Tick ID '{}' was not found".format(ID))
-elif len(rows) > 1:
-    print("Multiple rows with Tick ID '{}' found. Copying TickNet results to all rows...".format(ID))
-    print("Rows: ".format(rows))
-else:
-    print("Tick ID {} found. Copying TickNet results to row...".format(ID))
-    pass
-
-net_col = [species, sex, prob] # todo: re-assign labels to results from network
 
 try:
     NN_Prob = worksheet.find("NN Prob")
     NN_Species = worksheet.find("NN Species")
     NN_Sex = worksheet.find("NN Sex")
+    cols = [NN_Species, NN_Sex, NN_Prob]
 except gspread.exceptions.CellNotFound as err:
     print("Column name '{}' was not found in Row 1".format(err))
 
-cols = [NN_Species, NN_Sex, NN_Prob]
+for i in range(len(id)):
+    rows = worksheet.findall(id[i], in_column=worksheet.find("Tick_ID").col)
+    if len(rows) == 0:
+        print("Tick ID '{}' was not found".format(id[i]))
+    elif len(rows) > 1:
+        print("Multiple rows with Tick ID '{}' found. Copying TickNet results to all rows...".format(id[i]))
+        print("Rows: ".format(rows))
+    else:
+        print("Tick ID {} found. Copying TickNet results to row...".format(id[i]))
+        pass
 
-row = []
-for r in rows:
-    # row.append(cell.row)
-    for c in range(len(cols)):
-        worksheet.update_cell(r.row, cols[c].col, net_col[c])
-print(row)
+    for r in rows:
+        for c in range(len(cols)):
+            worksheet.update_cell(r.row, cols[c].col, input[c][i])
+        print("Row: ", r.row)
