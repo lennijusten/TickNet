@@ -1,0 +1,5 @@
+tensorflow
+tqdm
+pandas
+gspread
+Pillow
