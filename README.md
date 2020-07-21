@@ -1,6 +1,7 @@
 # TickNet
 
 ## 1. Installation
+The following lines can be copied into your console (called Terminal on mac). 
 
 ### Anaconda (recommended)
 ```bash
@@ -19,15 +20,44 @@ pip install -r requirements.txt
 ```
 
 ## 2. Model
-The model (.json file) and the model weights (.h5 files) are stored in the **Model/** directory.
+The model (.json file) and the model weights (.h5 files) are stored in the **Model/** directory. The model may be updated from time to time with the newest and hopefully best version. 
 
 ## 3. WMEL External Hard-drive
-The complete tick-image database is stored on the WMEL external hard-drive. This contains all the images used for training and is designed to be continuously updated as more images become available. .... Standard Naming system...
+The complete tick-image database is stored on the WMEL external hard-drive. This contains all the images used for training and is designed to be continuously updated as more images become available. 
+
+The WMEL drive contains two main image directories: 
+```
+/Volumes/WMEL/Tick Images/NN Images/Raw (if exists)
+/Volumes/WMEL/Tick Images/NN Images/Renamed (all)
+```
+
+The Raw image folder contains the raw images from some of data sources: Tick App (ta), WMEL Lab (MCEVBD). The raw images are not augmented at all and contain the original file names of the images. The Renamed folder contains the renamed image files from all the data sources: Tick App, WMEL Lab (MCEVBD), TickReport (tr), Lab Images (DSLR & mb). The network training script pulls directly from this folder so it is essential that this structure remains consistent! 
+
+The renamed images are all named accoring to a standard naming system which uses the following structure:
+```
+Genus_species_sex_lifestage_source_alive_fed_#.jpg
+```
+For example: `Dermacentor_variabilis_m_a_ta_unk_unfed_1.jpg`
+
+The labels have the following categories:  
+**Genus:** any  
+**species:** any  
+**sex:** male (m), female (f), unkown (unk)  
+**lifestage:** adult (a), nymph (n), larvae (l), unkown (unk)  
+**source:** Tick App (ta), WMEL Lab (MCEVBD), TickReport (tr), Images I took during 2020 in the WMEL Lab (DSLR or mb)   
+**alive:** dead (dead), alive (live), unkown (unk)   
+**fed:** fed (fed), unfed (unfed), unkown (unk)   
+
 
 ## 4. Usage (TickApp)
 The `TickApp_run.py` script has several functions designed to classify tick images, send results to the Image_ID spreadsheet, and tranfer images between Box, your local disk, and the WMEL external hard-drive. Below are some plain language descriptions of the functionality as well as some common usage examples. For a more traditional documentation, please see the `documentation.pdf` in the repository. 
+
+**A note on Box:** Any mode that accesses Box for file transfers will require the user to log-in. The script will prompt you for your username and for your password. Neither the username nor password are stored. Additionally, the password entry is secure so it will not be echoed (reprinted) to the console. 
+
+**Running the script:** The `TickApp_run.py` is a python script that can be run from your machines console (Terminal). Before running, you need to make sure that your environment is activated (See installation) and that your current directory is set to the TickNet repository. You can use the `cd <path_to_repository>` command to move between directories. Two other helpful commands for navigation are the `pwd` command which shows you what your current directory is and the `ls` command which lists the contents of you current directory.
+
 ### Auto 
-The `auto` mode is designed to make predictions on images that do not have an existing prediction on the Image_ID spreadsheet. The most likely application of this mode is in conjunction with the "tick-id-images" directory where new images are stored. In the `auto` mode, the results are automatically written to the spreadsheet specified with the `--year=` argument. Below are some usage examples:
+The `auto` mode is designed to make predictions on images that do not have an existing prediction entries on the Image_ID spreadsheet. The most likely application of this mode is in conjunction with the "tick-id-images" directory where new images are stored. In the `auto` mode, the results are automatically written to the spreadsheet specified with the `--year=` argument. Below are some usage examples:
 
 To make predictions on the newest batch of images and send the results to the 2020 Image_ID spreadsheet:
 ```
