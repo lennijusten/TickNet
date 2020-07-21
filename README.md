@@ -118,3 +118,8 @@ To make a prediction on those images and then write them to the spreadsheet (rev
 python TickApp_run.py --mode=predict --source=disk --path="Users/Lenni/Downloads/Images" --write --year=2020
 ```
 **Note:** You should not use the download mode to download images directly into the WMEL drive. This risks breaking certain existing file structures. Use the `sync` mode instead. 
+
+## Contributing and Issue Reporting
+The contribute or report issues please use Github's `Pull Requests` and `Issues` features. If reporting an issue/bug, please attach the console output so I can better address the issue. What is also helpful is recreating the error but with the `--logging` argument which will produce a more detailed console log. 
+
+I can be contacted at ljusten@wisc.edu
