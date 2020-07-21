@@ -25,7 +25,21 @@ The model (.json file) and the model weights (.h5 files) are stored in the **Mod
 The complete tick-image database is stored on the WMEL external hard-drive. This contains all the images used for training and is designed to be continuously updated as more images become available. .... Standard Naming system...
 
 ## 4. Usage (TickApp)
-The `TickApp_run.py` files contains several features for tick classification and book-keeping. The four main features are `predict`, `sync`, `download`, and `auto`. 
+The `TickApp_run.py` script has several functions designed to classify tick images, send results to the Image_ID spreadsheet, and tranfer images between Box, your local disk, and the WMEL external hard-drive. Below are some plain language descriptions of the functionality as well as some common usage examples. For a more traditional documentation, please see the `documentation.pdf` in the repository. 
+### Auto 
+The `auto` mode is designed to make predictions on images that do not have an existing prediction on the Image_ID spreadsheet. The most likely application of this mode is in conjunction with the "tick-id-images" directory where new images are stored. In the `auto` mode, the results are automatically written to the spreadsheet specified with the `--year=` argument. Below are some usage examples:
+
+To make predictions on the newest batch of images and send the results to the 2020 Image_ID spreadsheet:
+```
+python TickApp_run.py --mode=auto --source=box --path="tick-id-images" --year=2020
+```
+The `auto` mode has an additional feature specified by the `--disk_transfer` argument that moves a copy of the predicted images to the output directory:
+```
+python TickApp_run.py --mode=auto --source=box --path="tick-id-images" --year=2020 --disk_transfer
+```
+**Note:** Unlike the `predict` mode, the `auto` mode will not overwrite old predictions.
+
+
 ### Predict
 The `predict` mode is used to make predictions on a directory of images. With the `--source=` argument, you can specify whether the you want to predict a folder in Box or a folder on your local disk. The `--path=` argument specifies the path to the directory. With the `--write` argument, you can choose to send the results to the "Image_ID" spreadsheet, however you must then also specify the `--year=` argument which makes sure the results are sent to the right sheet. Below are some usage examples. 
 
@@ -74,16 +88,3 @@ To make a prediction on those images and then write them to the spreadsheet (rev
 python TickApp_run.py --mode=predict --source=disk --path="Users/Lenni/Downloads/Images" --write --year=2020
 ```
 **Note:** You should not use the download mode to download images directly into the WMEL drive. This risks breaking certain existing file structures. Use the `sync` mode instead. 
-
-### Auto 
-The `auto` mode is designed to make predictions on images that do not have an existing prediction on the Image_ID spreadsheet. The most likely application of this mode is in conjunction with the "tick-id-images" directory where new images are stored. In the `auto` mode, the results are automatically written to the spreadsheet specified with the `--year=` argument. Below are some usage examples:
-
-To make predictions on the newest batch of images and send the results to the 2020 Image_ID spreadsheet:
-```
-python TickApp_run.py --mode=auto --source=box --path="tick-id-images" --year=2020
-```
-The `auto` mode has an additional feature specified by the `--disk_transfer` argument that moves a copy of the predicted images to the output directory:
-```
-python TickApp_run.py --mode=auto --source=box --path="tick-id-images" --year=2020 --disk_transfer
-```
-**Note:** Unlike the `predict` mode, the `auto` mode will not overwrite old predictions.
