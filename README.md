@@ -73,4 +73,17 @@ To make a prediction on those images and then write them to the spreadsheet (rev
 ```
 python TickApp_run.py --mode=predict --source=disk --path="Users/Lenni/Downloads/Images" --write --year=2020
 ```
-**Note** You should not use the download mode to download images directly into the WMEL drive. This risks breaking certain existing file structures. Use the `sync` mode instead. 
+**Note:** You should not use the download mode to download images directly into the WMEL drive. This risks breaking certain existing file structures. Use the `sync` mode instead. 
+
+### Auto 
+The `auto` mode is designed to make predictions on images that do not have an existing prediction on the Image_ID spreadsheet. The most likely application of this mode is in conjunction with the "tick-id-images" directory where new images are stored. In the `auto` mode, the results are automatically written to the spreadsheet specified with the `--year=` argument. Below are some usage examples:
+
+To make predictions on the newest batch of images and send the results to the 2020 Image_ID spreadsheet:
+```
+python TickApp_run.py --mode=auto --source=box --path="tick-id-images" --year=2020
+```
+The `auto` mode has an additional feature specified by the `--disk_transfer` argument that moves a copy of the predicted images to the output directory:
+```
+python TickApp_run.py --mode=auto --source=box --path="tick-id-images" --year=2020 --disk_transfer
+```
+**Note:** Unlike the `predict` mode, the `auto` mode will not overwrite old predictions.
