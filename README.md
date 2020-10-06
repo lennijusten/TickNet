@@ -122,4 +122,4 @@ python TickApp_run.py --mode=predict --source=disk --path="Users/Lenni/Downloads
 ## Contributing and Issue Reporting
 The contribute or report issues please use Github's `Pull Requests` and `Issues` features. If reporting an issue/bug, please attach the console output so I can better address the issue. What is also helpful is recreating the error but with the `--logging` argument which will produce a more detailed console log. 
 
-I can be contacted at ljusten@wisc.edu
+Contact: ljusten@wisc.edu
