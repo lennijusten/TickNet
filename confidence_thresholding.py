@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Author: Lennart Justen
-# Data: 11/21/2020
+# Date: 11/21/2020
 
 # Calculate confidence thresholds based on Villon et al. 2020
 
